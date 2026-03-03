@@ -1,0 +1,1428 @@
+ <!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>ProbeThat — Free Pentest Tool for Startups</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+    :root {
+
+      --bg: #0a0a0a;
+
+      --surface: #111111;
+
+      --border: #1e1e1e;
+
+      --border-lit: #2e2e2e;
+
+      --amber: #f5a623;
+
+      --amber-dim: #7a5010;
+
+      --red: #e05252;
+
+      --green: #52c97a;
+
+      --blue: #5299e0;
+
+      --text: #e8e2d9;
+
+      --muted: #5a5650;
+
+      --font-mono: 'Space Mono', monospace;
+
+      --font-display: 'Syne', sans-serif;
+
+    }
+
+
+    html { scroll-behavior: smooth; }
+
+    body {
+
+      background: var(--bg);
+
+      color: var(--text);
+
+      font-family: var(--font-mono);
+
+      min-height: 100vh;
+
+      overflow-x: hidden;
+
+    }
+
+
+    /* Noise texture overlay */
+
+    body::before {
+
+      content: '';
+
+      position: fixed;
+
+      inset: 0;
+
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+
+      pointer-events: none;
+
+      z-index: 9999;
+
+      opacity: 0.4;
+
+    }
+
+
+    /* Header */
+
+    header {
+
+      padding: 28px 40px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      border-bottom: 1px solid var(--border);
+
+      position: sticky;
+
+      top: 0;
+
+      background: rgba(10,10,10,0.92);
+
+      backdrop-filter: blur(12px);
+
+      z-index: 100;
+
+    }
+
+
+    .logo {
+
+      font-family: var(--font-display);
+
+      font-weight: 800;
+
+      font-size: 1.4rem;
+
+      letter-spacing: -0.02em;
+
+    }
+
+    .logo span { color: var(--amber); }
+
+
+    .badge {
+
+      font-size: 0.65rem;
+
+      padding: 4px 10px;
+
+      border: 1px solid var(--amber-dim);
+
+      color: var(--amber);
+
+      border-radius: 2px;
+
+      letter-spacing: 0.12em;
+
+      text-transform: uppercase;
+
+    }
+
+
+    /* Hero */
+
+    .hero {
+
+      max-width: 860px;
+
+      margin: 0 auto;
+
+      padding: 100px 40px 60px;
+
+      text-align: center;
+
+    }
+
+
+    .hero-eyebrow {
+
+      font-size: 0.7rem;
+
+      letter-spacing: 0.2em;
+
+      text-transform: uppercase;
+
+      color: var(--amber);
+
+      margin-bottom: 24px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 10px;
+
+    }
+
+    .hero-eyebrow::before, .hero-eyebrow::after {
+
+      content: '';
+
+      width: 40px;
+
+      height: 1px;
+
+      background: var(--amber-dim);
+
+    }
+
+
+    h1 {
+
+      font-family: var(--font-display);
+
+      font-weight: 800;
+
+      font-size: clamp(2.4rem, 5vw, 4rem);
+
+      line-height: 1.05;
+
+      letter-spacing: -0.03em;
+
+      margin-bottom: 24px;
+
+    }
+
+    h1 em {
+
+      font-style: normal;
+
+      color: var(--amber);
+
+    }
+
+
+    .hero-sub {
+
+      color: var(--muted);
+
+      font-size: 0.9rem;
+
+      line-height: 1.8;
+
+      max-width: 560px;
+
+      margin: 0 auto 48px;
+
+    }
+
+
+    /* Scan form */
+
+    .scan-form {
+
+      background: var(--surface);
+
+      border: 1px solid var(--border-lit);
+
+      border-radius: 4px;
+
+      padding: 32px;
+
+      max-width: 680px;
+
+      margin: 0 auto;
+
+      position: relative;
+
+    }
+
+
+    .scan-form::before {
+
+      content: '// SCAN TARGET';
+
+      position: absolute;
+
+      top: -10px;
+
+      left: 20px;
+
+      background: var(--surface);
+
+      padding: 0 8px;
+
+      font-size: 0.65rem;
+
+      color: var(--amber);
+
+      letter-spacing: 0.1em;
+
+    }
+
+
+    .input-row {
+
+      display: flex;
+
+      gap: 12px;
+
+      margin-bottom: 16px;
+
+    }
+
+
+    .url-input {
+
+      flex: 1;
+
+      background: var(--bg);
+
+      border: 1px solid var(--border-lit);
+
+      color: var(--text);
+
+      font-family: var(--font-mono);
+
+      font-size: 0.85rem;
+
+      padding: 14px 16px;
+
+      border-radius: 2px;
+
+      outline: none;
+
+      transition: border-color 0.2s;
+
+    }
+
+    .url-input:focus { border-color: var(--amber); }
+
+    .url-input::placeholder { color: var(--muted); }
+
+
+    .scan-btn {
+
+      background: var(--amber);
+
+      color: #000;
+
+      border: none;
+
+      padding: 14px 28px;
+
+      font-family: var(--font-display);
+
+      font-weight: 700;
+
+      font-size: 0.85rem;
+
+      letter-spacing: 0.05em;
+
+      cursor: pointer;
+
+      border-radius: 2px;
+
+      transition: all 0.15s;
+
+      white-space: nowrap;
+
+    }
+
+    .scan-btn:hover { background: #ffc04a; transform: translateY(-1px); }
+
+    .scan-btn:active { transform: translateY(0); }
+
+    .scan-btn:disabled { background: var(--amber-dim); color: #555; cursor: not-allowed; transform: none; }
+
+
+    .consent-row {
+
+      display: flex;
+
+      align-items: flex-start;
+
+      gap: 12px;
+
+      font-size: 0.72rem;
+
+      color: var(--muted);
+
+      line-height: 1.6;
+
+    }
+
+    .consent-row input[type="checkbox"] {
+
+      margin-top: 2px;
+
+      accent-color: var(--amber);
+
+      flex-shrink: 0;
+
+      width: 14px;
+
+      height: 14px;
+
+    }
+
+    .consent-row a { color: var(--amber); text-decoration: none; }
+
+
+    /* Terminal output */
+
+    .terminal-section {
+
+      max-width: 860px;
+
+      margin: 48px auto;
+
+      padding: 0 40px;
+
+      display: none;
+
+    }
+
+    .terminal-section.visible { display: block; }
+
+
+    .terminal-header {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      background: #1a1a1a;
+
+      padding: 10px 16px;
+
+      border-radius: 4px 4px 0 0;
+
+      border: 1px solid var(--border-lit);
+
+      border-bottom: none;
+
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+
+    .dot.red { background: #e05252; }
+
+    .dot.yellow { background: #f5a623; }
+
+    .dot.green { background: #52c97a; }
+
+    .terminal-title { font-size: 0.7rem; color: var(--muted); margin-left: 8px; letter-spacing: 0.05em; }
+
+
+    .terminal {
+
+      background: #080808;
+
+      border: 1px solid var(--border-lit);
+
+      border-radius: 0 0 4px 4px;
+
+      padding: 20px;
+
+      font-size: 0.78rem;
+
+      line-height: 1.9;
+
+      min-height: 200px;
+
+      max-height: 400px;
+
+      overflow-y: auto;
+
+    }
+
+
+    .log-line { display: flex; gap: 12px; animation: fadeIn 0.2s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
+
+
+    .log-ts { color: var(--muted); flex-shrink: 0; }
+
+    .log-tag { flex-shrink: 0; font-weight: 700; width: 60px; }
+
+    .log-tag.info { color: var(--blue); }
+
+    .log-tag.warn { color: var(--amber); }
+
+    .log-tag.crit { color: var(--red); }
+
+    .log-tag.ok   { color: var(--green); }
+
+    .log-msg { color: var(--text); }
+
+
+    .blink { animation: blink 1s step-end infinite; }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+
+    /* Report section */
+
+    .report-section {
+
+      max-width: 860px;
+
+      margin: 0 auto 80px;
+
+      padding: 0 40px;
+
+      display: none;
+
+    }
+
+    .report-section.visible { display: block; }
+
+
+    .report-header {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 24px;
+
+      padding-bottom: 16px;
+
+      border-bottom: 1px solid var(--border);
+
+    }
+
+    .report-title {
+
+      font-family: var(--font-display);
+
+      font-weight: 700;
+
+      font-size: 1.2rem;
+
+    }
+
+    .download-btn {
+
+      background: transparent;
+
+      border: 1px solid var(--amber);
+
+      color: var(--amber);
+
+      padding: 10px 20px;
+
+      font-family: var(--font-mono);
+
+      font-size: 0.75rem;
+
+      cursor: pointer;
+
+      border-radius: 2px;
+
+      letter-spacing: 0.05em;
+
+      transition: all 0.15s;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+    }
+
+    .download-btn:hover { background: var(--amber); color: #000; }
+
+
+    .risk-score-card {
+
+      background: var(--surface);
+
+      border: 1px solid var(--border-lit);
+
+      border-radius: 4px;
+
+      padding: 28px 32px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 24px;
+
+      flex-wrap: wrap;
+
+      gap: 20px;
+
+    }
+
+
+    .risk-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 8px; }
+
+    .risk-number {
+
+      font-family: var(--font-display);
+
+      font-size: 3.5rem;
+
+      font-weight: 800;
+
+      line-height: 1;
+
+    }
+
+    .risk-number.critical { color: var(--red); }
+
+    .risk-number.high { color: #e07052; }
+
+    .risk-number.medium { color: var(--amber); }
+
+    .risk-number.low { color: var(--green); }
+
+
+    .risk-bars { flex: 1; max-width: 400px; display: flex; flex-direction: column; gap: 8px; }
+
+    .risk-bar-row { display: flex; align-items: center; gap: 12px; font-size: 0.72rem; }
+
+    .risk-bar-label { width: 70px; color: var(--muted); }
+
+    .risk-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+
+    .risk-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+
+    .risk-bar-fill.critical { background: var(--red); }
+
+    .risk-bar-fill.high { background: #e07052; }
+
+    .risk-bar-fill.medium { background: var(--amber); }
+
+    .risk-bar-fill.low { background: var(--green); }
+
+    .risk-bar-count { width: 20px; text-align: right; color: var(--muted); }
+
+
+    /* Findings */
+
+    .findings-grid { display: flex; flex-direction: column; gap: 12px; }
+
+
+    .finding-card {
+
+      background: var(--surface);
+
+      border: 1px solid var(--border);
+
+      border-left: 3px solid;
+
+      border-radius: 0 4px 4px 0;
+
+      overflow: hidden;
+
+      transition: border-color 0.2s;
+
+    }
+
+    .finding-card.critical { border-left-color: var(--red); }
+
+    .finding-card.high     { border-left-color: #e07052; }
+
+    .finding-card.medium   { border-left-color: var(--amber); }
+
+    .finding-card.low      { border-left-color: var(--green); }
+
+    .finding-card.info     { border-left-color: var(--blue); }
+
+
+    .finding-head {
+
+      padding: 16px 20px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 12px;
+
+      cursor: pointer;
+
+      user-select: none;
+
+    }
+
+    .finding-head:hover { background: rgba(255,255,255,0.02); }
+
+
+    .severity-pill {
+
+      font-size: 0.6rem;
+
+      padding: 3px 8px;
+
+      border-radius: 2px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.12em;
+
+      font-weight: 700;
+
+      flex-shrink: 0;
+
+    }
+
+    .severity-pill.critical { background: rgba(224,82,82,0.15); color: var(--red); }
+
+    .severity-pill.high     { background: rgba(224,112,82,0.15); color: #e07052; }
+
+    .severity-pill.medium   { background: rgba(245,166,35,0.15); color: var(--amber); }
+
+    .severity-pill.low      { background: rgba(82,201,122,0.15); color: var(--green); }
+
+    .severity-pill.info     { background: rgba(82,153,224,0.15); color: var(--blue); }
+
+
+    .finding-name { flex: 1; font-size: 0.85rem; }
+
+    .finding-chevron { color: var(--muted); font-size: 0.7rem; transition: transform 0.2s; }
+
+    .finding-card.open .finding-chevron { transform: rotate(90deg); }
+
+
+    .finding-body {
+
+      padding: 0 20px;
+
+      max-height: 0;
+
+      overflow: hidden;
+
+      transition: max-height 0.3s ease, padding 0.3s;
+
+    }
+
+    .finding-card.open .finding-body {
+
+      max-height: 600px;
+
+      padding: 0 20px 20px;
+
+    }
+
+
+    .finding-section-label {
+
+      font-size: 0.62rem;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.15em;
+
+      color: var(--muted);
+
+      margin: 12px 0 6px;
+
+    }
+
+    .finding-text { font-size: 0.8rem; line-height: 1.8; color: #b0a898; }
+
+
+    .code-snippet {
+
+      background: var(--bg);
+
+      border: 1px solid var(--border);
+
+      padding: 10px 14px;
+
+      font-size: 0.75rem;
+
+      color: var(--amber);
+
+      border-radius: 2px;
+
+      overflow-x: auto;
+
+      margin-top: 6px;
+
+    }
+
+
+    /* Features strip */
+
+    .features {
+
+      border-top: 1px solid var(--border);
+
+      border-bottom: 1px solid var(--border);
+
+      padding: 40px;
+
+      display: grid;
+
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+      gap: 32px;
+
+      max-width: 860px;
+
+      margin: 80px auto;
+
+    }
+
+    .feature-item { }
+
+    .feature-icon { font-size: 1.2rem; margin-bottom: 10px; }
+
+    .feature-name { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
+
+    .feature-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.7; }
+
+
+    /* Footer */
+
+    footer {
+
+      text-align: center;
+
+      padding: 40px;
+
+      font-size: 0.7rem;
+
+      color: var(--muted);
+
+      border-top: 1px solid var(--border);
+
+    }
+
+
+    /* Loading spinner in button */
+
+    .spinner {
+
+      width: 14px;
+
+      height: 14px;
+
+      border: 2px solid #00000040;
+
+      border-top-color: #000;
+
+      border-radius: 50%;
+
+      animation: spin 0.6s linear infinite;
+
+      display: inline-block;
+
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+
+    @media (max-width: 600px) {
+
+      header { padding: 20px; }
+
+      .hero { padding: 60px 20px 40px; }
+
+      .scan-form { padding: 20px; }
+
+      .input-row { flex-direction: column; }
+
+      .terminal-section, .report-section { padding: 0 20px; }
+
+      .features { padding: 30px 20px; }
+
+    }
+
+
+    /* API Key Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border-lit);
+  border-top: 2px solid var(--amber);
+  border-radius: 4px;
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  margin: 20px;
+  position: relative;
+}
+.modal-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--amber);
+  margin-bottom: 8px;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+.modal-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.modal-sub a {
+  color: var(--amber);
+  text-decoration: none;
+}
+.modal-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border-lit);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 12px 14px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+  letter-spacing: 0.04em;
+}
+.modal-input:focus { border-color: var(--amber); }
+.modal-input::placeholder { color: var(--muted); }
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.modal-cancel {
+  background: transparent;
+  border: 1px solid var(--border-lit);
+  color: var(--muted);
+  padding: 10px 20px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.modal-cancel:hover { border-color: var(--muted); color: var(--text); }
+.modal-confirm {
+  background: var(--amber);
+  color: #000;
+  border: none;
+  padding: 10px 24px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.modal-confirm:hover { background: #ffc04a; }
+.modal-error {
+  font-size: 0.72rem;
+  color: var(--red);
+  margin-bottom: 12px;
+  display: none;
+}
+.modal-error.visible { display: block; }
+  </style>
+
+</head>
+
+<body>
+
+
+<header>
+
+  <div class="logo">Probe<span>That</span></div>
+
+  <div class="badge">Free for Startups</div>
+
+</header>
+
+
+<main>
+
+  <section class="hero">
+
+    <div class="hero-eyebrow">AI-Powered Security Analysis</div>
+
+    <h1>Find your <em>vulnerabilities</em><br>before attackers do.</h1>
+
+    <p class="hero-sub">
+
+      Free automated penetration testing for early-stage startups. No signup, no credit card.
+
+      Just paste your URL and get a professional security report in minutes.
+
+    </p>
+
+
+    <div class="scan-form">
+
+      <div class="input-row">
+
+        <input
+
+          class="url-input"
+
+          id="urlInput"
+
+          type="url"
+
+          placeholder="https://yourapp.com"
+
+          autocomplete="off"
+
+          spellcheck="false"
+
+        />
+
+        <button class="scan-btn" id="scanBtn" onclick="startScan()">
+
+          Run Scan
+
+        </button>
+
+      </div>
+
+      <div class="consent-row">
+
+        <input type="checkbox" id="consentCheck" />
+
+        <label for="consentCheck">
+
+          I confirm that I own or have explicit written permission to perform security testing on this domain.
+
+          I accept full legal responsibility for this scan. <a href="#">Terms of Use</a>
+
+        </label>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Terminal log -->
+
+  <div class="terminal-section" id="terminalSection">
+
+    <div class="terminal-header">
+
+      <div class="dot red"></div>
+
+      <div class="dot yellow"></div>
+
+      <div class="dot green"></div>
+
+      <span class="terminal-title">scan_output — probethat</span>
+
+    </div>
+
+    <div class="terminal" id="terminal"></div>
+
+  </div>
+
+
+  <!-- Report -->
+
+  <div class="report-section" id="reportSection">
+
+    <div class="report-header">
+
+      <div class="report-title">Security Report</div>
+
+      <button class="download-btn" onclick="downloadPDF()">
+
+        ↓ Download PDF
+
+      </button>
+
+    </div>
+
+
+    <div class="risk-score-card" id="riskScoreCard"></div>
+
+
+    <div class="findings-grid" id="findingsGrid"></div>
+
+  </div>
+
+
+  <!-- Features -->
+
+  <div class="features">
+
+    <div class="feature-item">
+
+      <div class="feature-icon">🔐</div>
+
+      <div class="feature-name">SSL / TLS Analysis</div>
+
+      <div class="feature-desc">Cipher strength, cert expiry, HSTS enforcement, and protocol version checks.</div>
+
+    </div>
+
+    <div class="feature-item">
+
+      <div class="feature-icon">🗺️</div>
+
+      <div class="feature-name">Header & Cookie Audit</div>
+
+      <div class="feature-desc">CSP, CORS, X-Frame-Options, cookie flags, and information leakage via headers.</div>
+
+    </div>
+
+    <div class="feature-item">
+
+      <div class="feature-icon">📡</div>
+
+      <div class="feature-name">Port & Service Recon</div>
+
+      <div class="feature-desc">Open ports, exposed admin panels, and misconfigured service banners.</div>
+
+    </div>
+
+    <div class="feature-item">
+
+      <div class="feature-icon">🧠</div>
+
+      <div class="feature-name">AI Remediation</div>
+
+      <div class="feature-desc">GROQ-powered analysis explains each finding and provides specific fix recommendations.</div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Groq API Key Modal -->
+<div class="modal-overlay" id="apiKeyModal">
+  <div class="modal">
+    <div class="modal-label">Required</div>
+    <div class="modal-title">Enter your Groq API Key</div>
+    <p class="modal-sub">
+      Your key is used only for this scan and is never stored on our servers.
+      It is cleared when you close or refresh the page.<br><br>
+      Get a free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a>.
+    </p>
+    <input
+      class="modal-input"
+      id="apiKeyInput"
+      type="password"
+      placeholder="gsk_..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <div class="modal-error" id="apiKeyError">Please enter a valid Groq API key.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeApiKeyModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmApiKey()">Continue</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+
+<footer>
+
+  ProbeThat — Only scan systems you own or have permission to test. &nbsp;·&nbsp;
+
+  Built for founders, by Mohan Pawan Gollapalli.
+
+</footer>
+
+
+<script>
+const API_BASE = 'http://localhost:8000';
+
+let sessionApiKey = null;
+
+function ts() {
+  return new Date().toLocaleTimeString('en-US', { hour12: false });
+}
+
+function log(tag, tagClass, msg) {
+  const terminal = document.getElementById('terminal');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `
+    <span class="log-ts">${ts()}</span>
+    <span class="log-tag ${tagClass}">[${tag}]</span>
+    <span class="log-msg">${msg}</span>
+  `;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function startScan() {
+  const url = document.getElementById('urlInput').value.trim();
+  const consent = document.getElementById('consentCheck').checked;
+
+  if (!url) { alert('Please enter a URL.'); return; }
+  if (!consent) { alert('You must confirm permission to test this domain.'); return; }
+
+  try { new URL(url.startsWith('http') ? url : 'https://' + url); }
+  catch { alert('Please enter a valid URL.'); return; }
+
+  if (!sessionApiKey) {
+    openApiKeyModal();
+    return;
+  }
+
+  executeScan(url);
+}
+
+function openApiKeyModal() {
+  document.getElementById('apiKeyModal').classList.add('visible');
+  document.getElementById('apiKeyInput').focus();
+}
+
+function closeApiKeyModal() {
+  document.getElementById('apiKeyModal').classList.remove('visible');
+  document.getElementById('apiKeyError').classList.remove('visible');
+}
+
+function confirmApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key.startsWith('gsk_') || key.length < 20) {
+    document.getElementById('apiKeyError').classList.add('visible');
+    return;
+  }
+  sessionApiKey = key;
+  closeApiKeyModal();
+
+  const url = document.getElementById('urlInput').value.trim();
+  executeScan(url);
+}
+
+// Close modal if user clicks outside it
+document.getElementById('apiKeyModal').addEventListener('click', function(e) {
+  if (e.target === this) closeApiKeyModal();
+});
+
+// Allow Enter key to confirm
+document.getElementById('apiKeyInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') confirmApiKey();
+});
+
+async function executeScan(url) {
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Scanning...';
+
+  document.getElementById('terminal').innerHTML = '';
+  document.getElementById('terminalSection').classList.add('visible');
+  document.getElementById('reportSection').classList.remove('visible');
+
+  log('INFO', 'info', `Target: <strong>${url}</strong>`);
+  log('INFO', 'info', 'Initializing scan modules...');
+
+  try {
+    const res = await fetch(`${API_BASE}/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, consent: true, groq_api_key: sessionApiKey })
+    });
+
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    const { scan_id } = await res.json();
+
+    log('OK', 'ok', `Scan started. ID: ${scan_id}`);
+    await pollScan(scan_id);
+
+  } catch (err) {
+    log('ERR', 'crit', `Failed to connect to backend: ${err.message}`);
+    log('WARN', 'warn', 'Is the backend running? See README.md for setup instructions.');
+    btn.disabled = false;
+    btn.innerHTML = 'Run Scan';
+  }
+}
+
+async function pollScan(scanId) {
+  const btn = document.getElementById('scanBtn');
+
+  const progressMessages = [
+    ['DNS',    'info', 'Resolving DNS records and checking zone transfer...'],
+    ['SSL',    'info', 'Analyzing TLS configuration and certificate chain...'],
+    ['HDR',    'info', 'Auditing HTTP response headers...'],
+    ['COOKIE', 'info', 'Inspecting cookie security flags...'],
+    ['CRAWL',  'info', 'Crawling application endpoints...'],
+    ['PORT',   'info', 'Scanning common service ports...'],
+    ['AI',     'warn', 'Running AI analysis on findings...'],
+  ];
+  let msgIndex = 0;
+
+  const progressInterval = setInterval(() => {
+    if (msgIndex < progressMessages.length) {
+      const [tag, cls, msg] = progressMessages[msgIndex++];
+      log(tag, cls, msg);
+    }
+  }, 2200);
+
+  const maxPolls = 60;
+  let polls = 0;
+
+  const poll = async () => {
+    polls++;
+    if (polls > maxPolls) {
+      clearInterval(progressInterval);
+      log('ERR', 'crit', 'Scan timed out after 3 minutes.');
+      btn.disabled = false;
+      btn.innerHTML = 'Run Scan';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/scan/${scanId}`);
+      const data = await res.json();
+
+      if (data.status === 'complete') {
+        clearInterval(progressInterval);
+        log('OK', 'ok', `Scan complete. ${data.report.findings.length} findings identified.`);
+        log('OK', 'ok', `Overall risk score: ${data.report.risk_score}/100`);
+        btn.disabled = false;
+        btn.innerHTML = 'Run Scan';
+        renderReport(data.report);
+        return;
+      } else if (data.status === 'error') {
+        clearInterval(progressInterval);
+        log('ERR', 'crit', `Scan failed: ${data.error}`);
+        btn.disabled = false;
+        btn.innerHTML = 'Run Scan';
+        return;
+      }
+    } catch (err) { /* keep polling */ }
+
+    setTimeout(poll, 3000);
+  };
+
+  setTimeout(poll, 3000);
+}
+
+function renderReport(report) {
+  const reportSection = document.getElementById('reportSection');
+  reportSection.classList.add('visible');
+
+  const counts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+  report.findings.forEach(f => { if (counts[f.severity] !== undefined) counts[f.severity]++; });
+
+  const scoreClass = report.risk_score >= 70 ? 'critical' : report.risk_score >= 40 ? 'high' : report.risk_score >= 20 ? 'medium' : 'low';
+  const maxBar = Math.max(...Object.values(counts), 1);
+
+  document.getElementById('riskScoreCard').innerHTML = `
+    <div>
+      <div class="risk-label">Risk Score</div>
+      <div class="risk-number ${scoreClass}">${report.risk_score}</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:6px;">${report.executive_summary_short}</div>
+    </div>
+    <div class="risk-bars">
+      ${['critical','high','medium','low','info'].map(s => `
+        <div class="risk-bar-row">
+          <span class="risk-bar-label">${s}</span>
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill ${s}" style="width:${(counts[s]/maxBar)*100}%"></div>
+          </div>
+          <span class="risk-bar-count">${counts[s]}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  const grid = document.getElementById('findingsGrid');
+  grid.innerHTML = '';
+
+  const sorted = [...report.findings].sort((a, b) => {
+    const order = { critical:0, high:1, medium:2, low:3, info:4 };
+    return order[a.severity] - order[b.severity];
+  });
+
+  sorted.forEach((f) => {
+    const card = document.createElement('div');
+    card.className = `finding-card ${f.severity}`;
+    card.innerHTML = `
+      <div class="finding-head" onclick="toggleFinding(this)">
+        <span class="severity-pill ${f.severity}">${f.severity}</span>
+        <span class="finding-name">${f.name}</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section-label">Description</div>
+        <div class="finding-text">${f.description}</div>
+        ${f.evidence ? `<div class="finding-section-label">Evidence</div><div class="code-snippet">${f.evidence}</div>` : ''}
+        <div class="finding-section-label">Impact</div>
+        <div class="finding-text">${f.impact}</div>
+        <div class="finding-section-label">Remediation</div>
+        <div class="finding-text">${f.remediation}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  reportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleFinding(head) {
+  head.parentElement.classList.toggle('open');
+}
+
+async function downloadPDF() {
+  const url = document.getElementById('urlInput').value.trim();
+  document.querySelector('.download-btn').textContent = 'Generating...';
+  window.location.href = `${API_BASE}/report/pdf?url=${encodeURIComponent(url)}`;
+  setTimeout(() => { document.querySelector('.download-btn').textContent = 'Download PDF'; }, 2000);
+}
+</script>
+
+</body>
+
+</html> 
