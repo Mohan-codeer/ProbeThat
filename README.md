@@ -140,7 +140,7 @@ This tool is for use **only on systems you own or have explicit written permissi
 ## Built With
 
 - **FastAPI** — async Python web framework
-- **Claude (claude-opus-4-6)** — AI analysis and remediation
+- **Groq** — AI analysis and remediation
 - **ReportLab** — PDF generation
 - **dnspython** — DNS queries
 - **requests** — HTTP probing
