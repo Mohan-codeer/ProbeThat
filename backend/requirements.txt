@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+httpx
+requests
+anthropic
+dnspython
+reportlab
+python-multipart
+pydantic
