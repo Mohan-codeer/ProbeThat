@@ -13,7 +13,7 @@ pentest-tool/
 │   └── index.html          # Single-file web app (serve with any static host)
 └── backend/
     ├── main.py             # FastAPI server — scan endpoints
-    ├── ai_analysis.py      # Claude API integration
+    ├── ai_analysis.py      # Groq API integration
     ├── report_generator.py # PDF report generation
     ├── requirements.txt
     └── scanner/
@@ -39,9 +39,6 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-
-# Set your Anthropic API key
-export ANTHROPIC_API_KEY="your-api-key-here"
 
 # Run the server
 uvicorn main:app --reload --port 8000
