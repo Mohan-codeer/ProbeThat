@@ -1,4 +1,4 @@
-# ProbeThat 🔍
+# ProbeThat 
 > Free AI-powered penetration testing tool for startups
 
 ProbeThat scans a URL and generates a professional security report using automated scanners + Claude AI analysis. No login required.
